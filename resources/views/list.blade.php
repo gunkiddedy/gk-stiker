@@ -62,7 +62,8 @@
                 <table style="background: red;" border="1">
                     <tr>
                         <td>
-                            {{ ' Data '.$j }}    
+                            {{ ' Data '.$j }}
+                            KIB227185LOKASI12.02.12.04.010101.30929.09290010BARANGAlat Khusus Keamanan LainnyaRUANGRUANG TUOPDSDN PONJONG IIITAHUN201    
                         </td>
                     </tr>
                 </table>                
@@ -75,7 +76,8 @@
                 <table style="background: green;" border="1">
                     <tr>
                         <td>
-                            {{ ' Data '.($k) }}    
+                            {{ ' Data '.($k) }}   
+                            KIB227185LOKASI12.02.12.04.010101.30929.09290010BARANGAlat Khusus Keamanan LainnyaRUANGRUANG TUOPDSDN PONJONG IIITAHUN201
                         </td>
                     </tr>
                 </table>

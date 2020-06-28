@@ -16,14 +16,21 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('/home', 'StikerController@index')->name('home')->middleware('auth');
+Route::get('/home', 'IndexStikerController@index')->name('homefirst')->middleware('auth');
+// Route::get('/home', 'PdfController@index')->name('home')->middleware('auth');
 
 Auth::routes();
 
-Route::get('/index', 'IndexStikerController@index')->name('stiker.index')->middleware('auth');
-Route::get('/index/{org}/{$rng}', 'IndexStikerController@index')->middleware('auth');
-Route::get('/topdf','IndexStikerController@toPDF')->name('topdf')->middleware('auth');
-Route::get('/test','IndexStikerController@test')->name('test')->middleware('auth');
+// Route::get('/index', 'IndexStikerController@index')->name('stiker.index')->middleware('auth');
+// Route::get('/index/{org}/{$rng}', 'IndexStikerController@index')->middleware('auth');
+// Route::get('/topdf','IndexStikerController@toPDF')->name('topdf')->middleware('auth');
+// Route::get('/test','IndexStikerController@test')->name('test')->middleware('auth');
+
+// Route::get('/testpdf','PdfController@test')->name('testpdf')->middleware('auth');
+// Route::get('/test','IndexStikerController@test')->name('testpdffirst')->middleware('auth');
+// Route::get('/generatepdf','PdfController@generate_pdf')->name('generate_pdf')->middleware('auth');
+
+
 
 
 

@@ -87,8 +87,8 @@
                 </div>
 
                 <div class="links">
-                    <a href="/stiker">Daftar Barang</a>
-                    <a href="/stiker/chart">Print Stiker</a>
+                    {{-- <a href="/stiker">Daftar Barang</a>
+                    <a href="/stiker/chart">Print Stiker</a> --}}
                     
                 </div>
             </div>

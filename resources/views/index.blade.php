@@ -33,7 +33,7 @@
                             </div>
                             <div class="form-group">
                                 <button type="submit" id="btnFiterSubmitSearch" class="btn btn-success">
-                                    <i class="fa fa-search"></i> Tampilkan
+                                    <i class="fa fa-search"></i> Download PDF
                                 </button>
                                 {{-- <input type="reset" id="reset" value="Reload page" class="btn btn-success"> --}}
                             </div>

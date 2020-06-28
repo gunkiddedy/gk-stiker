@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\View;
 
 error_reporting(0);
 class IndexStikerController extends Controller
@@ -15,10 +16,13 @@ class IndexStikerController extends Controller
     {
 
         $organisasi = $request->organisasi;
-        $ruang = $request->ruang;        
+        $ruang = $request->ruang;
+        
+        // loop from table masterruang and master organisasi
         $masterruang = DB::table('masterruang_view')->get();
         $masterorganisasi = DB::table('masterorganisasi_view')->get();
 
+        // if get request organisasi and ruang
         if ($request->has(['organisasi', 'ruang'])) 
         {
             $data = DB::table('kib')
@@ -27,56 +31,104 @@ class IndexStikerController extends Controller
             ->orderBy('kodekib', 'asc')->get();
 
             $split = '';
+
+            // if data found make a loop for each data
             if(count($data) > 0){
                 foreach($data as $data){
                     $array[] = $data;
                 }
-                $countarray = count($array);
-                //////// jika jumlah array ganjil maka tambahkan element terakhir dengan nilai pertama dari array :-)
-                // if( $countarray % 2 !== 0 ){
-                //     array_push($array, $array[0]);
-                // }
-                $split = array_chunk($array, 9); //split an array 
+                // split array become 9 data per index
+                $split = array_chunk($array, 9);
             }
-            // echo '<pre>'.var_dump($split[6]).'</pre>';
+            
+            // count of array (passing into view and get i for loop)
             $index = count($split);
-            // $bagi = $count / 2;
+
+            // only render to view
             // return view('pdf', ['split' => $split, 'index' => $index]);
 
-            $pdf = PDF::loadview( 'pdf', ['split' => $split, 'index' => $index] );
-            PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif', 'margin-bottom' => 0]);
-            return $pdf->stream('pdf');
-            return $pdf->download(now().'pdf');
+            foreach($data as $k => $v){
+                if($k == 'uraiorganisasi'){
+                    $nama_opd = $v;
+                }
+                if($k == 'ruang'){
+                    $nama_ruang = $v;
+                }
+                
+            }
+            // print_r($nama_opd.' - '.$nama_ruang);
+            $filename = $nama_opd.'-'.$nama_ruang.now();
+            // generate to pdf file
+            // $view = view('pdf', ['split' => $split, 'index' => $index]);
+            // PDF::loadHTML($view)->save('ftftft.pdf');
+            // PDF::setOptions(['enable-javascript' => true,'javascript-delay' => 13500]);
+            $pdf = PDF::loadView( 'pdf', ['split' => $split, 'index' => $index] );
+            // PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif', 'margin-bottom' => 0]);
+            // return $pdf->stream('pdf');
+            return $pdf->stream($filename.'pdf');
         }
 
+        // if no request redirect to the index page
         return view('index', ['opd' => $masterorganisasi, 'ruang' => $masterruang, 'org'=>$organisasi, 'rng'=>$ruang] );
     }
 
-    public function test(Type $var = null)
+    public function test(Request $request)
     {
-        return view('list');
-    }
 
-    public function toPDF(Request $request)
-    {
-        if( $request->hasAny(['organisasi']) ) {
-            // $organisasi = Request::get('organisasi');
-            // $data = DB::table('kib')
-            // ->join('masterruang', 'masterruang.kodebidang', '=', 'kib.kodebidang')
-            // ->whereRaw("uraiorganisasi =  '$organisasi' and ruang = '$ruang' and statusdata='aktif' ")->get();
+        $organisasi = $request->organisasi;
+        $ruang = $request->ruang;
+        
+        // loop from table masterruang and master organisasi
+        $masterruang = DB::table('masterruang_view')->get();
+        $masterorganisasi = DB::table('masterorganisasi_view')->get();
+
+        // if get request organisasi and ruang
+        if ($request->has(['organisasi', 'ruang'])) 
+        {
+            $data = DB::table('kib')
+            ->join('masterruang', 'masterruang.kodebidang', '=', 'kib.kodebidang')
+            ->whereRaw("uraiorganisasi =  '$organisasi' and ruang = '$ruang' and statusdata='aktif' ")
+            ->orderBy('kodekib', 'asc')->get();
+
+            $split = '';
+
+            // if data found make a loop for each data
+            if(count($data) > 0){
+                foreach($data as $data){
+                    $array[] = $data;
+                }
+                // split array become 9 data per index
+                $split = array_chunk($array, 9);
+            }
             
-            // // return view('list', ['data' => $data, 'opd' => $masterorganisasi, 'ruang' => $masterruang] );
-            // $pdf = PDF::loadview( 'pdf', ['data' => $data] );
-            // PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif', 'margin-bottom' => 0]);
-            // return $pdf->stream('pdf');
-            // return $pdf->download('Hehehe'.'pdf');
-            echo 'yes';
+            // count of array (passing into view and get i for loop)
+            $index = count($split);
+
+            // only render to view
+            return view('pdf', ['split' => $split, 'index' => $index]);
+
         }
-        // return view('index', ['data' => $data, 'opd' => $masterorganisasi, 'ruang' => $masterruang] );
+
+        // if no request redirect to the index page
+        // return view('index', ['opd' => $masterorganisasi, 'ruang' => $masterruang, 'org'=>$organisasi, 'rng'=>$ruang] );
     }
 
     // public function toPDF(Request $request)
     // {
-    //     echo 'h';
+    //     if( $request->hasAny(['organisasi']) ) {
+    //         $organisasi = Request::get('organisasi');
+    //         $data = DB::table('kib')
+    //         ->join('masterruang', 'masterruang.kodebidang', '=', 'kib.kodebidang')
+    //         ->whereRaw("uraiorganisasi =  '$organisasi' and ruang = '$ruang' and statusdata='aktif' ")->get();
+            
+    //         // return view('list', ['data' => $data, 'opd' => $masterorganisasi, 'ruang' => $masterruang] );
+    //         $pdf = PDF::loadview( 'pdf', ['data' => $data] );
+    //         PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif', 'margin-bottom' => 0]);
+    //         return $pdf->stream('pdf');
+    //         return $pdf->download('Hehehe'.'pdf');
+    //         echo 'yes';
+    //     }
+    //     return view('index', ['data' => $data, 'opd' => $masterorganisasi, 'ruang' => $masterruang] );
     // }
+
 }
