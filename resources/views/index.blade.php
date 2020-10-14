@@ -14,26 +14,37 @@
                         </div>
                     @endif
                     <div class="alert alert-info">
-                        <form method="GET">
+                        <form method="GET" id="form1">
                             <div class="form-group">
                                 <label for="organisasi">Nama OPD</label>
-                                <select name="organisasi" id="nama_opd" class="form-control">
-                                    @foreach ($opd as $item)
-                                        <option value="{{ $item->organisasi }}">{{ $item->organisasi }}</option>
+                                <select name="organisasi" id="organisasi" class="form-control">
+                                    <option value="">
+                                        {{ ($_GET['organisasi']) ? '-Tampilkan semua-' : '-Pilih-'}}
+                                    </option>
+\                                   @foreach ($opd as $item)
+                                        <option value="{{ $item->organisasi }}"
+                                            {{ ($item->organisasi == $_GET['organisasi']) ? 'selected' : '' }} >
+                                            {{ $item->organisasi }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
+
                             <div class="form-group">
                                 <label for="ruang"> Nama Ruang</label>
-                                <select name="ruang" id="nama_ruang" class="form-control">
+                                <select name="koderuang" id="koderuang" class="form-control">
+                                    <option value="">-Pilih-</option>
                                     @foreach ($ruang as $item)
-                                        <option value="{{ $item->ruang }}">{{ $item->ruang }}</option>
+                                        <option value="{{ $item->koderuang }}">{{ $item->ruang }}</option>
                                     @endforeach
                                 </select>
                             </div>
+                            
+
                             <div class="form-group">
+                                
                                 <button type="submit" id="btnFiterSubmitSearch" class="btn btn-success">
-                                    <i class="fa fa-search"></i> Download PDF
+                                    {{ ($_GET['organisasi']) ? 'Download PDF' : 'Cari data'}}
                                 </button>
                                 {{-- <input type="reset" id="reset" value="Reload page" class="btn btn-success"> --}}
                             </div>
@@ -84,6 +95,10 @@
 <script>
     $(document).ready( function () {
         $("select").select2();
+
+        $('#organisasi').on('change', function(e){
+            $('#form1').submit();
+        });
     });
 </script>
 @endpush

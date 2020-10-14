@@ -10,66 +10,107 @@ use Illuminate\Support\Facades\View;
 error_reporting(0);
 class IndexStikerController extends Controller
 {
-    //
     
     public function index(Request $request)
     {
 
-        $organisasi = $request->organisasi;
-        $ruang = $request->ruang;
-        
-        // loop from table masterruang and master organisasi
-        $masterruang = DB::table('masterruang_view')->get();
-        $masterorganisasi = DB::table('masterorganisasi_view')->get();
+        $masterorganisasi = DB::table('masterorganisasi')->get();
 
-        // if get request organisasi and ruang
-        if ($request->has(['organisasi', 'ruang'])) 
-        {
-            $data = DB::table('kib')
-            ->join('masterruang', 'masterruang.kodebidang', '=', 'kib.kodebidang')
-            ->whereRaw("uraiorganisasi =  '$organisasi' and ruang = '$ruang' and statusdata='aktif' ")
-            ->orderBy('kodekib', 'asc')->get();
+        // $masterruang = DB::table('masterruang')->get();
 
-            $split = '';
+        if($request->organisasi){
 
-            // if data found make a loop for each data
-            if(count($data) > 0){
-                foreach($data as $data){
-                    $array[] = $data;
-                }
-                // split array become 9 data per index
-                $split = array_chunk($array, 9);
+            $org = $request->organisasi;
+
+            $get_organisasi = DB::table('masterorganisasi')->where('organisasi', '=', "$org")->limit(1)->get();
+
+            foreach ($get_organisasi as $value) {
+                $kodeurusan = $value->kodeurusan;
+                $kodesuburusan = $value->kodesuburusan;
+                $kodeorganisasi = $value->kodeorganisasi;
+                $kodeunit = $value->kodeunit;
+                $kodesubunit = $value->kodesubunit;
             }
-            
-            // count of array (passing into view and get i for loop)
-            $index = count($split);
 
-            // only render to view
-            // return view('pdf', ['split' => $split, 'index' => $index]);
+            $query_ruang = DB::table('masterruang')
+                ->whereRaw("
+                    kodeurusan='".$kodeurusan."'
+                    AND kodesuburusan='".$kodesuburusan."'
+                    AND kodeorganisasi='".$kodeorganisasi."'
+                    AND kodeunit='".$kodeunit."'
+                    AND kodesubunit='".$kodesubunit."'
+                    AND penanggungjawab_jabatan <> ''
+                ")->get();
 
-            foreach($data as $k => $v){
-                if($k == 'uraiorganisasi'){
-                    $nama_opd = $v;
-                }
-                if($k == 'ruang'){
-                    $nama_ruang = $v;
+            if ($request->koderuang){
+                $data = DB::table('kib')
+                ->join('masterruang', 'masterruang.koderuang', '=', 'kib.koderuang')
+                ->whereRaw("uraiorganisasi =  '$request->organisasi' and kib.koderuang = '$request->koderuang' and statusdata='aktif' ")
+                ->orderBy('kodekib', 'asc')->get();
+
+                $split = '';
+
+                if(count($data) > 0){
+                    foreach($data as $data){
+                        $array[] = $data;
+                    }
+                    $split = array_chunk($array, 9);
                 }
                 
+                $index = count($split);
+
+                foreach($data as $k => $v){
+                    if($k == 'uraiorganisasi'){
+                        $nama_opd = $v;
+                    }
+                    if($k == 'ruang'){
+                        $nama_ruang = $v;
+                    }
+                    
+                }
+
+                $filename = $nama_opd.'-'.$nama_ruang.now();
+                $pdf = PDF::loadView( 'pdf', ['split' => $split, 'index' => $index] );
+                return $pdf->stream($filename.'pdf');
             }
-            // print_r($nama_opd.' - '.$nama_ruang);
-            $filename = $nama_opd.'-'.$nama_ruang.now();
-            // generate to pdf file
-            // $view = view('pdf', ['split' => $split, 'index' => $index]);
-            // PDF::loadHTML($view)->save('ftftft.pdf');
-            // PDF::setOptions(['enable-javascript' => true,'javascript-delay' => 13500]);
-            $pdf = PDF::loadView( 'pdf', ['split' => $split, 'index' => $index] );
-            // PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif', 'margin-bottom' => 0]);
-            // return $pdf->stream('pdf');
-            return $pdf->stream($filename.'pdf');
+
+            return view('index', ['opd' => $get_organisasi, 'ruang' => $query_ruang] );
         }
 
-        // if no request redirect to the index page
-        return view('index', ['opd' => $masterorganisasi, 'ruang' => $masterruang, 'org'=>$organisasi, 'rng'=>$ruang] );
+        // if ($request->has(['koderuang'])) 
+        // {
+        //     $data = DB::table('kib')
+        //     ->join('masterruang', 'masterruang.koderuang', '=', 'kib.koderuang')
+        //     ->whereRaw("uraiorganisasi =  '$request->organisasi' and kib.koderuang = '$request->koderuang' and statusdata='aktif' ")
+        //     ->orderBy('kodekib', 'asc')->get();
+
+        //     $split = '';
+
+        //     if(count($data) > 0){
+        //         foreach($data as $data){
+        //             $array[] = $data;
+        //         }
+        //         $split = array_chunk($array, 9);
+        //     }
+            
+        //     $index = count($split);
+
+        //     foreach($data as $k => $v){
+        //         if($k == 'uraiorganisasi'){
+        //             $nama_opd = $v;
+        //         }
+        //         if($k == 'ruang'){
+        //             $nama_ruang = $v;
+        //         }
+                
+        //     }
+
+        //     $filename = $nama_opd.'-'.$nama_ruang.now();
+        //     $pdf = PDF::loadView( 'pdf', ['split' => $split, 'index' => $index] );
+        //     return $pdf->stream($filename.'pdf');
+        // }
+
+        return view('index', ['opd' => $masterorganisasi, 'ruang' => $masterruang] );
     }
 
     public function test(Request $request)

@@ -60,10 +60,11 @@
                                         <td rowspan="6">
                                             <img class="imgs"
                                                 src="data:image/png;base64, 
-                                                {!! base64_encode(QrCode::size(55)
+                                                {!! base64_encode(QrCode::size(50)
                                                 ->errorCorrection('H')
                                                 ->generate($item->qrcode)) !!} 
                                             ">
+                                            {{$item->qrcode}}
                                         </td>
                                     </tr>
                                     <tr>
@@ -105,10 +106,11 @@
                                     <td rowspan="6">
                                         <img class="imgs"
                                             src="data:image/png;base64, 
-                                            {!! base64_encode(QrCode::size(55)
+                                            {!! base64_encode(QrCode::size(50)
                                             ->errorCorrection('H')
                                             ->generate($item->qrcode)) !!} 
                                         ">
+                                        {{$item->qrcode}}
                                     </td>
                                 </tr>
                                 <tr>
